@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 type ListEntity struct {
@@ -18,8 +20,21 @@ type server struct {
 	list *linkedlist.LinkedList
 }
 
+type customValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *customValidator) Validate(i interface{}) error {
+	if err := cv.validator.Struct(i); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return nil
+}
+
 func V2() (*echo.Echo, error) {
 	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Validator = &customValidator{validator: validator.New()}
 
 	s := &server{}
 	l := linkedlist.NewLinkedList()
