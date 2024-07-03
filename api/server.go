@@ -6,6 +6,7 @@ import (
 	v1 "linkedlist/api/v1"
 	v2 "linkedlist/api/v2"
 	"linkedlist/config"
+	"log/slog"
 	"net/http"
 )
 
@@ -38,6 +39,7 @@ func (a *Api) Start(ctx context.Context) error {
 		Addr:    fmt.Sprintf(":%d", config.Confs.Server.Port),
 		Handler: a.Mux,
 	}
+	slog.Info("Running", "port", config.Confs.Server.Port)
 	err := a.Server.ListenAndServe()
 	if err != nil {
 		return err
